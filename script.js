@@ -14,10 +14,21 @@ function cardDeck(){
     return randomCardDeck;
 }
 
+const handRankings = {
+    '4,1': 'Four of a Kind',
+    '3,2': 'Full House',
+    '3,1,1': 'Three of a Kind',
+    '2,2,1': 'Two Pair',
+    '2,1,1,1': 'One Pair',
+    '1,1,1,1,1': 'High Card'
+};
+
+let handComposition = {}
 
 function cardNumber(){
     let englishDeckNumbers = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
     let randomCardNumber = englishDeckNumbers[getRandomNum(englishDeckNumbers.length)];
+    !handComposition[randomCardNumber] ? handComposition[randomCardNumber] = 1 : handComposition[randomCardNumber]++;   
     return randomCardNumber;
 }
 
@@ -65,12 +76,27 @@ function generateNewCard(){
     deckElements.forEach(deckElement => cardDeckColorCheker(deckElement, newDeck))
 }
 
+function handCompositionHandler(){
+    let handCompositionValues = Object.values(handComposition).sort().reverse().toString();
+    let handRankingsKeys = Object.keys(handRankings);
+    for (let key of handRankingsKeys){
+        if (key == handCompositionValues) {return handRankings[key];}
+    }
+    return "Unkown hand"
+}
 
 function newCardButtonListener(){
     let newCardListener = document.querySelector("#new-card");
     let cardCounter = 1;
     newCardListener.addEventListener("click", (e) => {
-        cardCounter < 4 ? cardCounter++ : newCardListener.parentNode.removeChild(newCardListener);
         generateNewCard();
+        if (cardCounter < 4) cardCounter++;
+        else {
+            newCardListener.parentNode.removeChild(newCardListener);
+            let firstDiv = document.querySelector("#your-hand");
+            let newDiv = document.createElement("div");
+            newDiv.innerHTML = `<h1 class="text-center text-danger mt-4">${handCompositionHandler()}</h1>`;
+            firstDiv.appendChild(newDiv);
+        }
     });
 }
